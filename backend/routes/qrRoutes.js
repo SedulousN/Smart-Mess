@@ -8,4 +8,9 @@ router.post('/generate', qrController.generateQRCode);
 // Route to validate QR Code
 router.post('/validate', qrController.validateQRCode);
 
+// Serve QR codes statically
+// router.use('/qrcodes', express.static('qrcodes'));
+router.use('/qrcodes', express.static('qrcodes'));
+
+
 module.exports = router;

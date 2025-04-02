@@ -1,80 +1,85 @@
-const QRCode = require('qrcode');
-const fs = require('fs');
-const path = require('path');
-const Student = require('../../../Smart_Mess/backend/models/student');
+    const QRCode = require('qrcode');
+    const multer = require('multer');
+    const path = require('path');
+    const Student = require('../models/student');
 
-// Generate QR Code
-exports.generateQRCode = async (req, res) => {
-    try {
-        const { studentID, name } = req.body;
-
-        // Check if the student already exists
-        let student = await Student.findOne({ studentID });
-
-        if (student) {
-            return res.status(400).json({ success: false, message: "Student already exists!" });
+    // Multer Storage Configuration
+    const storage = multer.diskStorage({
+        destination: (req, file, cb) => {
+            cb(null, 'qrcodes'); // Ensure this path matches the static path in index.js
+        },
+        filename: (req, file, cb) => {
+            const { studentID } = req.body;
+            cb(null, `${studentID}.png`);
         }
+    });
 
-        // Generate QR Code data
-        const qrData = `${studentID}-${name}`;
-        const qrCodeFilePath = path.join(__dirname, `../../../Smart_Mess/backend/qrcodes/${studentID}.png`);
+    const upload = multer({ storage });
 
-        // Ensure the directory exists
-        const dir = path.dirname(qrCodeFilePath);
-        if (!fs.existsSync(dir)) {
-            fs.mkdirSync(dir, { recursive: true });
+    // Generate QR Code
+    exports.generateQRCode = async (req, res) => {
+        try {
+            const { studentID, name } = req.body;
+
+            // Check if student already exists
+            let student = await Student.findOne({ studentID });
+            if (student) {
+                return res.status(400).json({ success: false, message: "Student already exists!" });
+            }
+
+            // Generate QR Code data
+            const qrData = `${studentID}-${name}`;
+            const qrCodeFilePath = path.resolve(__dirname, '../../qrcodes', `${studentID}.png`);
+
+            // Generate and save QR Code image
+            await QRCode.toFile(qrCodeFilePath, qrData);
+
+            // Save student data with QR code path
+            student = new Student({
+                studentID,
+                name,
+                qrCode: `/qrcodes/${studentID}.png`,
+                hasEaten: false
+            });
+
+            await student.save();
+
+            res.status(201).json({
+                success: true,
+                qrCodePath: `/qrcodes/${studentID}.png`,
+                message: "QR Code generated and saved successfully!"
+            });
+
+        } catch (error) {
+            console.error('QR Code Generation Error:', error);
+            res.status(500).json({ success: false, message: error.message });
         }
+    };
 
-        // Save QR code as an image
-        await QRCode.toFile(qrCodeFilePath, qrData);
+    // Validate QR Code
+    exports.validateQRCode = async (req, res) => {
+        try {
+            const { studentID } = req.body;
 
-        // Save student details with QR code image path
-        student = new Student({
-            studentID,
-            name,
-            qrCode: `/qrcodes/${studentID}.png`, // Store the relative path
-            hasEaten: false
-        });
+            // Find student by ID
+            const student = await Student.findOne({ studentID });
 
-        await student.save();
+            if (!student) {
+                return res.status(404).json({ success: false, message: "Invalid QR Code!" });
+            }
 
-        res.status(201).json({ 
-            success: true, 
-            qrCodePath: `/qrcodes/${studentID}.png`, 
-            message: "QR Code generated and saved successfully!" 
-        });
+            // Check if student has already eaten
+            if (student.hasEaten) {
+                return res.status(400).json({ success: false, message: "Meal already claimed!" });
+            }
 
-    } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
-    }
-};
+            // Mark student as having eaten
+            student.hasEaten = true;
+            await student.save();
 
-
-// Validate QR Code
-exports.validateQRCode = async (req, res) => {
-    try {
-        const { studentID } = req.body;
-        // console.log(studentID);
-        // console.log(req.body);
-
-        // Find student by ID
-        const student = await Student.findOne({ studentID });
-
-        if (!student) {
-            return res.status(404).json({ success: false, message: "Invalid QR Code!" });
+            res.json({ success: true, message: "QR Code validated. Enjoy your meal!" });
+        } catch (error) {
+            console.error('QR Code Validation Error:', error);
+            res.status(500).json({ success: false, message: error.message });
         }
-
-        // Check if the student has already eaten
-        if (student.hasEaten) {
-            return res.status(400).json({ success: false, message: "Meal already claimed!" });
-        }
-
-        // Mark student as having eaten
-        student.hasEaten = true;
-        await student.save();
-
-        res.json({ success: true, message: "QR Code validated. Enjoy your meal!" });
-    } catch (error) {
-        res.status(500).json({ success: false, message: error.message });
-    }
-};
+    };
