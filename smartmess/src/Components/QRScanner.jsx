@@ -38,7 +38,7 @@ const QRScanner = () => {
 
     const validateQRCode = async (qrData) => {
         const studentID = qrData.split("-")[0];
-
+    
         try {
             const response = await fetch("http://localhost:5500/api/qr/validate", {
                 method: "POST",
@@ -46,7 +46,7 @@ const QRScanner = () => {
                 body: JSON.stringify({ studentID }),
             });
             const data = await response.json();
-
+    
             if (data.success) {
                 playBeepSound(true); // Play success sound
                 setIsSuccess(true);
@@ -54,23 +54,24 @@ const QRScanner = () => {
                 playBeepSound(false); // Play error sound
                 setIsSuccess(false);
             }
-
+    
             setMessage(data.message);
+    
+            // Reset scanner after 3 seconds
+            setTimeout(() => {
+                scanningEnabledRef.current = true;
+                isProcessingRef.current = false;
+                setMessage("");
+                setIsSuccess(null);
+            }, 3000);
         } catch (error) {
             playBeepSound(false);
             setIsSuccess(false);
             setMessage("Validation failed!");
             console.error("API Error:", error);
         }
-
-        // Reset scanner after 3 seconds
-        setTimeout(() => {
-            scanningEnabledRef.current = true;
-            isProcessingRef.current = false;
-            setMessage("");
-            setIsSuccess(null);
-        }, 3000);
     };
+    
 
     const playBeepSound = (success) => {
         const beepSound = new Audio(success ? "/sounds/success-beep.mp3" : "/sounds/error-beep.mp3");

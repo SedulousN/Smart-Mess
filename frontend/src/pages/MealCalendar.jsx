@@ -7,6 +7,11 @@ const MealCalendar = () => {
     const mealStatus = {
         Monday: { Breakfast: true, Lunch: false, Snacks: true, Dinner: false },
         Tuesday: { Breakfast: false, Lunch: false, Snacks: false, Dinner: false },
+        Wednesday: { Breakfast: false, Lunch: false, Snacks: false, Dinner: false },
+        Thrusday: { Breakfast: false, Lunch: false, Snacks: false, Dinner: false },
+        Friday: { Breakfast: false, Lunch: false, Snacks: false, Dinner: false },
+        Saturday: { Breakfast: false, Lunch: false, Snacks: false, Dinner: false },
+        Sunday: { Breakfast: false, Lunch: true, Snacks: false, Dinner: false }
         // Add more data for remaining days...
     };
 
