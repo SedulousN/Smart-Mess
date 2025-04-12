@@ -30,7 +30,7 @@ const Login = () => {
                 setQRCodePath(data.qrCodePath); // Display QR code after login
 
                 if (data.role === 'admin') {
-                    window.location.href = 'http://localhost:5173';
+                    window.location.href = 'http://localhost:5175';
                 } else if (data.role === 'user') {
                     navigate('/');
                 }

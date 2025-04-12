@@ -2,16 +2,17 @@ import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { jwtDecode } from "jwt-decode";
 import axios from "axios";
-import messMenuImage from "../assets/Mess-menu.jpg"; // Add your mess menu image here
+import messMenuImage from "../assets/Mess-menu.jpg"; // Replace with your actual image
 
 const Dashboard = () => {
     const [mealType, setMealType] = useState("");
     const [rating, setRating] = useState(0);
+    const [feedbackMessage, setFeedbackMessage] = useState("");
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [qrCode, setQrCode] = useState("");
 
     const checkTokenValidity = () => {
-        const token = localStorage.getItem('token');
+        const token = localStorage.getItem("token");
         if (token) {
             try {
                 const decodedToken = jwtDecode(token);
@@ -20,7 +21,7 @@ const Dashboard = () => {
                     return decodedToken.studentID;
                 }
             } catch (error) {
-                console.error('Error decoding token:', error);
+                console.error("Error decoding token:", error);
             }
         }
         return null;
@@ -33,7 +34,7 @@ const Dashboard = () => {
 
             axios.get(`/api/students/${studentID}/qrcode`)
                 .then((response) => setQrCode(response.data.qrCodePath))
-                .catch((error) => console.error('Error fetching QR code:', error));
+                .catch((error) => console.error("Error fetching QR code:", error));
         }
 
         const currentHour = new Date().getHours();
@@ -49,14 +50,37 @@ const Dashboard = () => {
     }, []);
 
     const handleLogout = () => {
-        localStorage.removeItem('token');
-        localStorage.removeItem('role');
+        localStorage.removeItem("token");
+        localStorage.removeItem("role");
         setIsLoggedIn(false);
-        window.location.href = '/login';
+        window.location.href = "/login";
     };
 
     const handleSubmitFeedback = () => {
-        alert(`Thank you for rating ${mealType} as ${rating} stars!`);
+        if (rating === 0 || feedbackMessage.trim() === "") {
+            alert("Please select a rating and enter a message.");
+            return;
+        }
+
+        const studentID = checkTokenValidity();
+
+        axios.post("http://localhost:5500/api/feedback", {
+            studentID,
+            rating,
+            message: feedbackMessage,
+            mealType,
+            timestamp: new Date().toISOString(),
+        })
+        
+        .then(() => {
+            alert("Thank you for your feedback!");
+            setRating(0);
+            setFeedbackMessage("");
+        })
+        .catch((error) => {
+            console.error("Error submitting feedback:", error);
+            alert("Failed to submit feedback. Please try again.");
+        });
     };
 
     return (
@@ -64,9 +88,9 @@ const Dashboard = () => {
             <div className="row">
                 {/* Left Section: Mess Menu Image */}
                 <div className="col-md-4 text-center">
-                    <img 
-                        src={messMenuImage} 
-                        alt="Mess Menu" 
+                    <img
+                        src={messMenuImage}
+                        alt="Mess Menu"
                         className="img-fluid rounded shadow-lg"
                     />
                 </div>
@@ -97,6 +121,7 @@ const Dashboard = () => {
                         )}
                     </div>
 
+                    {/* QR Code Display */}
                     {qrCode && (
                         <div className="mt-4 text-center">
                             <h2>Your QR Code</h2>
@@ -104,6 +129,7 @@ const Dashboard = () => {
                         </div>
                     )}
 
+                    {/* Feedback Section */}
                     <div className="mt-4 card p-4 text-center">
                         <h2>Rate Your {mealType}</h2>
                         <div className="d-flex justify-content-center mt-3">
@@ -117,10 +143,21 @@ const Dashboard = () => {
                                 </button>
                             ))}
                         </div>
+
+                        <div className="form-group mt-3">
+                            <textarea
+                                className="form-control"
+                                placeholder="Write your feedback..."
+                                rows="3"
+                                value={feedbackMessage}
+                                onChange={(e) => setFeedbackMessage(e.target.value)}
+                            />
+                        </div>
+
                         <button
                             className="btn btn-primary mt-3"
                             onClick={handleSubmitFeedback}
-                            disabled={rating === 0}
+                            disabled={rating === 0 || feedbackMessage.trim() === ""}
                         >
                             Submit Feedback
                         </button>
