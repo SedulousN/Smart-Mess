@@ -56,7 +56,7 @@ const Profile = () => {
             )}
 
             <button
-                className="mt-4 px-4 py-2 bg-red-500 text-white rounded-lg"
+                className="mt-4 px-4 py-2 bg-danger text-white rounded-lg"
                 onClick={() => {
                     localStorage.removeItem("token");
                     window.location.href = "/login";

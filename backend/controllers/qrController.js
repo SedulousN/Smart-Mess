@@ -58,9 +58,7 @@
     };
 
     // Validate QR Code
-// Validate QR Code
-// Validate QR Code
-// Validate QR Code
+
 exports.validateQRCode = async (req, res) => {
     try {
         const { studentID } = req.body;
@@ -75,8 +73,7 @@ exports.validateQRCode = async (req, res) => {
         // Get the current time to determine the meal period
         const currentHour = new Date().getHours();
         let currentMeal = '';
-        let status = "Missed";  // Default to Missed
-
+        
         if (currentHour >= 8 && currentHour < 12) {
             currentMeal = "Breakfast";
         } else if (currentHour >= 12 && currentHour < 17) {
@@ -89,37 +86,61 @@ exports.validateQRCode = async (req, res) => {
 
         // Check if the student has already eaten in the current period
         if (student.hasEaten && student.lastMeal === currentMeal) {
-            status = "Claimed";  // Meal already claimed
             return res.status(400).json({ success: false, message: `Meal already claimed for ${currentMeal}!` });
         }
 
-        // If the student has eaten before in a previous period, reset hasEaten for the new meal
+        // If lastMeal is different, allow scanning for new meal period
         if (student.lastMeal !== currentMeal) {
-            student.hasEaten = false;  // Reset for new meal period
+            student.hasEaten = false; // Reset eating status
         }
 
-        // Mark student as having eaten and set the last meal period
+        // Mark student as having eaten and update lastMeal
         student.hasEaten = true;
         student.lastMeal = currentMeal;
-
-        // Save the student document with updated status
         await student.save();
 
-        // Add the meal history entry
-        const mealDate = new Date().toISOString().split('T')[0]; // Get the current date in YYYY-MM-DD format
-        await MealHistory.create({
-            studentID,
-            date: mealDate,
-            meal: currentMeal,
-            status: "Claimed"  // Successfully claimed the meal
-        });
+        // Meal history tracking
+        const mealDate = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
+
+        // Find today's meal history for the student
+        let mealHistory = await MealHistory.findOne({ studentID, date: mealDate });
+
+        if (!mealHistory) {
+            // If no entry exists for today, create a new one
+            mealHistory = new MealHistory({
+                studentID,
+                date: mealDate
+            });
+        }
+
+        // Increment the correct meal counter
+        switch (currentMeal) {
+            case "Breakfast":
+                mealHistory.breakfastCount += 1;
+                break;
+            case "Lunch":
+                mealHistory.lunchCount += 1;
+                break;
+            case "Snacks":
+                mealHistory.snacksCount += 1;
+                break;
+            case "Dinner":
+                mealHistory.dinnerCount += 1;
+                break;
+            default:
+                break;
+        }
+
+        await mealHistory.save();
 
         res.json({ success: true, message: `QR Code validated. Enjoy your ${currentMeal}!` });
+
     } catch (error) {
         console.error('QR Code Validation Error:', error);
         res.status(500).json({ success: false, message: error.message });
     }
 };
+
 
 
 // Job or task to automatically mark missed meals (can be scheduled to run every hour)

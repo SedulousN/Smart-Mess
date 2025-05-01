@@ -85,18 +85,9 @@ const Dashboard = () => {
 
     return (
         <div className="container mt-5">
-            <div className="row">
-                {/* Left Section: Mess Menu Image */}
-                <div className="col-md-4 text-center">
-                    <img
-                        src={messMenuImage}
-                        alt="Mess Menu"
-                        className="img-fluid rounded shadow-lg"
-                    />
-                </div>
-
-                {/* Right Section: Links */}
-                <div className="col-md-8">
+            <div className="row justify-content-center">
+                
+                <div className="col-md-8 ">
                     <h1 className="text-primary text-center mb-4">Smart Mess Dashboard</h1>
 
                     <div className="list-group">

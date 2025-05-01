@@ -30,12 +30,17 @@ const MessMenu = () => {
 
   return (
     <div className="max-w-4xl mx-auto p-6 bg-white shadow-lg rounded-lg">
-      <h1 className="text-3xl font-bold mb-4">Mess Menu</h1>
+      <h1 className="text-3xl font-bold mb-4 mx-auto">Mess Menu</h1>
       {menuUrl ? (
         fileType === 'pdf' ? (
           <embed src={`${menuUrl}?t=${Date.now()}`} width="100%" height="600px" type="application/pdf" />
         ) : (
-          <img src={`${menuUrl}?t=${Date.now()}`} alt="Mess Menu" className="w-full h-auto rounded-md shadow" />
+          <img 
+            src={`${menuUrl}?t=${Date.now()}`} 
+            alt="Mess Menu" 
+            className="rounded-md shadow mx-auto d-block" 
+            style={{ width: '800px', height: '900px' }} 
+          />
         )
       ) : (
         <p>No mess menu uploaded yet.</p>
