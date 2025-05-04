@@ -3,6 +3,7 @@
     const path = require('path');
     const Student = require('../models/student');
     const MealHistory = require('../models/mealHistory');
+    const MealSummary = require('../models/MealSummary');
 
     // Multer Storage Configuration
     const storage = multer.diskStorage({
