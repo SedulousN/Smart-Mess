@@ -3,6 +3,7 @@
     const path = require('path');
     const Student = require('../models/student');
     const MealHistory = require('../models/mealHistory');
+    const MealSummary = require('../models/MealSummary');
 
     // Multer Storage Configuration
     const storage = multer.diskStorage({
@@ -59,87 +60,74 @@
 
     // Validate QR Code
 
-exports.validateQRCode = async (req, res) => {
-    try {
-        const { studentID } = req.body;
-
-        // Find student by ID
-        const student = await Student.findOne({ studentID });
-
-        if (!student) {
-            return res.status(404).json({ success: false, message: "Invalid QR Code!" });
+    exports.validateQRCode = async (req, res) => {
+        try {
+            const { studentID } = req.body;
+    
+            const student = await Student.findOne({ studentID });
+            if (!student) {
+                return res.status(404).json({ success: false, message: "Invalid QR Code!" });
+            }
+    
+            const currentHour = new Date().getHours();
+            let currentMeal = '';
+    
+            if (currentHour >= 8 && currentHour < 12) {
+                currentMeal = "Breakfast";
+            } else if (currentHour >= 12 && currentHour < 17) {
+                currentMeal = "Lunch";
+            } else if (currentHour >= 17 && currentHour < 20) {
+                currentMeal = "Snacks";
+            } else {
+                currentMeal = "Dinner";
+            }
+    
+            if (student.hasEaten && student.lastMeal === currentMeal) {
+                return res.status(400).json({ success: false, message: `Meal already claimed for ${currentMeal}!` });
+            }
+    
+            if (student.lastMeal !== currentMeal) {
+                student.hasEaten = false;
+            }
+    
+            student.hasEaten = true;
+            student.lastMeal = currentMeal;
+            await student.save();
+    
+            const mealDate = new Date().toISOString().split('T')[0];
+    
+            let mealHistory = await MealHistory.findOne({ studentID, date: mealDate });
+    
+            if (!mealHistory) {
+                mealHistory = new MealHistory({
+                    studentID,
+                    date: mealDate,
+                    meal: currentMeal,
+                    status: "Taken"
+                });
+            } else {
+                mealHistory.meal = currentMeal;
+                mealHistory.status = "Taken";
+            }
+    
+            await mealHistory.save();
+    
+            // Update or create MealSummary
+            const summary = await MealSummary.findOne({ date: mealDate, meal: currentMeal });
+            if (summary) {
+                summary.count += 1;
+                await summary.save();
+            } else {
+                await MealSummary.create({ date: mealDate, meal: currentMeal, count: 1 });
+            }
+    
+            res.json({ success: true, message: `QR Code validated. Enjoy your ${currentMeal}!` });
+    
+        } catch (error) {
+            console.error('QR Code Validation Error:', error);
+            res.status(500).json({ success: false, message: error.message });
         }
-
-        // Get the current time to determine the meal period
-        const currentHour = new Date().getHours();
-        let currentMeal = '';
-        
-        if (currentHour >= 8 && currentHour < 12) {
-            currentMeal = "Breakfast";
-        } else if (currentHour >= 12 && currentHour < 17) {
-            currentMeal = "Lunch";
-        } else if (currentHour >= 17 && currentHour < 20) {
-            currentMeal = "Snacks";
-        } else {
-            currentMeal = "Dinner";
-        }
-
-        // Check if the student has already eaten in the current period
-        if (student.hasEaten && student.lastMeal === currentMeal) {
-            return res.status(400).json({ success: false, message: `Meal already claimed for ${currentMeal}!` });
-        }
-
-        // If lastMeal is different, allow scanning for new meal period
-        if (student.lastMeal !== currentMeal) {
-            student.hasEaten = false; // Reset eating status
-        }
-
-        // Mark student as having eaten and update lastMeal
-        student.hasEaten = true;
-        student.lastMeal = currentMeal;
-        await student.save();
-
-        // Meal history tracking
-        const mealDate = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
-
-        // Find today's meal history for the student
-        let mealHistory = await MealHistory.findOne({ studentID, date: mealDate });
-
-        if (!mealHistory) {
-            // If no entry exists for today, create a new one
-            mealHistory = new MealHistory({
-                studentID,
-                date: mealDate
-            });
-        }
-
-        // Increment the correct meal counter
-        switch (currentMeal) {
-            case "Breakfast":
-                mealHistory.breakfastCount += 1;
-                break;
-            case "Lunch":
-                mealHistory.lunchCount += 1;
-                break;
-            case "Snacks":
-                mealHistory.snacksCount += 1;
-                break;
-            case "Dinner":
-                mealHistory.dinnerCount += 1;
-                break;
-            default:
-                break;
-        }
-
-        await mealHistory.save();
-
-        res.json({ success: true, message: `QR Code validated. Enjoy your ${currentMeal}!` });
-
-    } catch (error) {
-        console.error('QR Code Validation Error:', error);
-        res.status(500).json({ success: false, message: error.message });
-    }
-};
+    };
 
 
 

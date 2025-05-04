@@ -32,6 +32,7 @@ mongoose.connect('mongodb://localhost:27017/messDB', {
 // Routes
 app.use('/api/qr', qrRoutes);
 app.use("/api/auth", authRouter);
+app.use('/api/admin', qrRoutes);
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
