@@ -103,33 +103,25 @@ exports.validateQRCode = async (req, res) => {
         const mealDate = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
 
         // Find today's meal history for the student
-        let mealHistory = await MealHistory.findOne({ studentID, date: mealDate });
+        let mealHistory = await MealHistory.findOne({ studentID, date: mealDate, meal: currentMeal  });
 
         if (!mealHistory) {
             // If no entry exists for today, create a new one
             mealHistory = new MealHistory({
                 studentID,
-                date: mealDate
+                date: mealDate,
+                meal: currentMeal,
+                status: "Claimed"  // Mark the meal as claimed
             });
         }
-
-        // Increment the correct meal counter
-        switch (currentMeal) {
-            case "Breakfast":
-                mealHistory.breakfastCount += 1;
-                break;
-            case "Lunch":
-                mealHistory.lunchCount += 1;
-                break;
-            case "Snacks":
-                mealHistory.snacksCount += 1;
-                break;
-            case "Dinner":
-                mealHistory.dinnerCount += 1;
-                break;
-            default:
-                break;
+        else {
+            // If entry exists, update the meal and status
+            mealHistory.meal = currentMeal;
+            mealHistory.status = "Claimed";  // Mark the meal as claimed
         }
+
+        
+      
 
         await mealHistory.save();
 

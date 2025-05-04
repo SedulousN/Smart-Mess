@@ -19,7 +19,7 @@ const AppRoutes = () => {
                 <Routes>
                     <Route path="/" element={<Dashboard />} />
                     <Route path="/profile" element={<Profile />} />
-                    <Route path="/meal-calendar" element={<MealCalendar />} />
+                    {/* <Route path="/meal-calendar" element={<MealCalendar />} /> */}
                     <Route path="/meal-history" element={<MealHistory />} />
                     <Route path="/mess-menu" element={<MessMenu />} />
                     <Route path="/notices" element={<Notices />} />

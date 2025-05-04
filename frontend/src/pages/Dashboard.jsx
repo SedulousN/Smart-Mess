@@ -2,7 +2,7 @@ import { Link } from "react-router-dom";
 import { useState, useEffect } from "react";
 import { jwtDecode } from "jwt-decode";
 import axios from "axios";
-import messMenuImage from "../assets/Mess-menu.jpg"; // Replace with your actual image
+import messMenuImage from "../assets/Mess-menu.jpg";
 
 const Dashboard = () => {
     const [mealType, setMealType] = useState("");
@@ -10,6 +10,7 @@ const Dashboard = () => {
     const [feedbackMessage, setFeedbackMessage] = useState("");
     const [isLoggedIn, setIsLoggedIn] = useState(false);
     const [qrCode, setQrCode] = useState("");
+    const [userGreeting, setUserGreeting] = useState("");
 
     const checkTokenValidity = () => {
         const token = localStorage.getItem("token");
@@ -31,20 +32,23 @@ const Dashboard = () => {
         const studentID = checkTokenValidity();
         if (studentID) {
             setIsLoggedIn(true);
-
             axios.get(`/api/students/${studentID}/qrcode`)
                 .then((response) => setQrCode(response.data.qrCodePath))
                 .catch((error) => console.error("Error fetching QR code:", error));
         }
 
-        const currentHour = new Date().getHours();
-        if (currentHour >= 8 && currentHour < 12) {
+        const hour = new Date().getHours();
+        if (hour < 12) {
+            setUserGreeting("Good Morning");
             setMealType("Breakfast");
-        } else if (currentHour >= 12 && currentHour < 17) {
+        } else if (hour < 17) {
+            setUserGreeting("Good Afternoon");
             setMealType("Lunch");
-        } else if (currentHour >= 17 && currentHour < 20) {
+        } else if (hour < 20) {
+            setUserGreeting("Good Evening");
             setMealType("Snacks");
         } else {
+            setUserGreeting("Good Night");
             setMealType("Dinner");
         }
     }, []);
@@ -63,7 +67,6 @@ const Dashboard = () => {
         }
 
         const studentID = checkTokenValidity();
-
         axios.post("http://localhost:5500/api/feedback", {
             studentID,
             rating,
@@ -71,87 +74,97 @@ const Dashboard = () => {
             mealType,
             timestamp: new Date().toISOString(),
         })
-        
-        .then(() => {
-            alert("Thank you for your feedback!");
-            setRating(0);
-            setFeedbackMessage("");
-        })
-        .catch((error) => {
-            console.error("Error submitting feedback:", error);
-            alert("Failed to submit feedback. Please try again.");
-        });
+            .then(() => {
+                alert("Thank you for your feedback!");
+                setRating(0);
+                setFeedbackMessage("");
+            })
+            .catch((error) => {
+                console.error("Error submitting feedback:", error);
+                alert("Failed to submit feedback. Please try again.");
+            });
     };
 
     return (
-        <div className="container mt-5">
-            <div className="row justify-content-center">
-                
-                <div className="col-md-8 ">
-                    <h1 className="text-primary text-center mb-4">Smart Mess Dashboard</h1>
+        <div className="container py-5">
+            <h1 className="text-center text-primary mb-4">Smart Mess Dashboard</h1>
 
-                    <div className="list-group">
-                        <Link to="/profile" className="list-group-item list-group-item-action">Profile</Link>
-                        <Link to="/meal-calendar" className="list-group-item list-group-item-action">Meal Calendar</Link>
-                        <Link to="/meal-history" className="list-group-item list-group-item-action">Meal History</Link>
-                        <Link to="/mess-menu" className="list-group-item list-group-item-action">Mess Menu</Link>
-                        <Link to="/notices" className="list-group-item list-group-item-action">Notices</Link>
+            {isLoggedIn && (
+                <h5 className="text-center text-secondary mb-4">{userGreeting}, welcome back!</h5>
+            )}
 
-                        {isLoggedIn ? (
-                            <button
-                                className="list-group-item list-group-item-action text-danger"
-                                onClick={handleLogout}
-                            >
-                                Logout
-                            </button>
-                        ) : (
-                            <>
-                                <Link to="/login" className="list-group-item list-group-item-action">Login</Link>
-                                <Link to="/register" className="list-group-item list-group-item-action">Register</Link>
-                            </>
-                        )}
+            <div className="row">
+                {/* Navigation Links */}
+                <div className="col-md-4 mb-4">
+                    <div className="card shadow-sm">
+                        <div className="card-header bg-primary text-white">
+                            Navigation
+                        </div>
+                        <div className="list-group list-group-flush">
+                            <Link to="/profile" className="list-group-item">👤 Profile</Link>
+                            {/* <Link to="/meal-calendar" className="list-group-item">📖 Meal Calendar</Link> */}
+                            <Link to="/meal-history" className="list-group-item">📅 Meal History</Link>
+                            <Link to="/mess-menu" className="list-group-item">🍽️ Mess Menu</Link>
+                            <Link to="/notices" className="list-group-item">📢 Notices</Link>
+
+                            {isLoggedIn ? (
+                                <button className="list-group-item list-group-item-danger text-center" onClick={handleLogout}>
+                                    🚪 Logout
+                                </button>
+                            ) : (
+                                <>
+                                    <Link to="/login" className="list-group-item">🔐 Login</Link>
+                                    <Link to="/register" className="list-group-item">📝 Register</Link>
+                                </>
+                            )}
+                        </div>
                     </div>
+                </div>
 
-                    {/* QR Code Display */}
+                {/* QR Code & Feedback Section */}
+                <div className="col-md-8">
+                    {/* QR Code Card */}
                     {qrCode && (
-                        <div className="mt-4 text-center">
-                            <h2>Your QR Code</h2>
-                            <img src={qrCode} alt="QR Code" className="img-thumbnail w-50" />
+                        <div className="card shadow-sm mb-4">
+                            <div className="card-body text-center">
+                                <h5 className="card-title">🎫 Your QR Code</h5>
+                                <img src={qrCode} alt="QR Code" className="img-fluid rounded w-50 mt-3" />
+                            </div>
                         </div>
                     )}
 
-                    {/* Feedback Section */}
-                    <div className="mt-4 card p-4 text-center">
-                        <h2>Rate Your {mealType}</h2>
-                        <div className="d-flex justify-content-center mt-3">
-                            {[1, 2, 3, 4, 5].map((star) => (
-                                <button
-                                    key={star}
-                                    className={`btn btn-outline-warning mx-1 ${star <= rating ? "text-warning" : ""}`}
-                                    onClick={() => setRating(star)}
-                                >
-                                    ★
-                                </button>
-                            ))}
-                        </div>
-
-                        <div className="form-group mt-3">
+                    {/* Feedback Card */}
+                    <div className="card shadow-sm">
+                        <div className="card-body">
+                            <h5 className="card-title text-center mb-3">⭐ Rate Your {mealType}</h5>
+                            <div className="d-flex justify-content-center mb-3">
+                                {[1, 2, 3, 4, 5].map((star) => (
+                                    <button
+                                        key={star}
+                                        className={`btn btn-outline-warning mx-1 ${star <= rating ? "text-warning" : ""}`}
+                                        onClick={() => setRating(star)}
+                                    >
+                                        ★
+                                    </button>
+                                ))}
+                            </div>
                             <textarea
-                                className="form-control"
-                                placeholder="Write your feedback..."
+                                className="form-control mb-3"
                                 rows="3"
+                                placeholder="Leave your feedback..."
                                 value={feedbackMessage}
                                 onChange={(e) => setFeedbackMessage(e.target.value)}
-                            />
+                            ></textarea>
+                            <div className="text-center">
+                                <button
+                                    className="btn btn-success"
+                                    disabled={rating === 0 || feedbackMessage.trim() === ""}
+                                    onClick={handleSubmitFeedback}
+                                >
+                                    Submit Feedback
+                                </button>
+                            </div>
                         </div>
-
-                        <button
-                            className="btn btn-primary mt-3"
-                            onClick={handleSubmitFeedback}
-                            disabled={rating === 0 || feedbackMessage.trim() === ""}
-                        >
-                            Submit Feedback
-                        </button>
                     </div>
                 </div>
             </div>
