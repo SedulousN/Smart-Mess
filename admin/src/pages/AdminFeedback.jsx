@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import axios from "axios";
-import '../AdminFeedback.css'; // Optional for custom styling
+// import '../AdminFeedback.css'; // Optional for custom styling
 
 const AdminFeedback = () => {
     const [feedbacks, setFeedbacks] = useState([]);

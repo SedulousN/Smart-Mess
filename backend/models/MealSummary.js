@@ -1,21 +1,12 @@
-// models/MealSummary.js
 const mongoose = require('mongoose');
+const Schema = mongoose.Schema;
 
-const mealSummarySchema = new mongoose.Schema({
-  date: {
-    type: String, // Format: YYYY-MM-DD
-    required: true,
-  },
-  meal: {
-    type: String, // e.g., Breakfast, Lunch, Snacks, Dinner
-    required: true,
-  },
-  count: {
-    type: Number,
-    default: 0,
-  },
+const mealSummarySchema = new Schema({
+  date: { type: String, required: true },
+  mealType: { type: String, enum: ['Breakfast', 'Lunch', 'Snacks', 'Dinner'], required: true },
+  count: { type: Number, required: true }
 });
 
-mealSummarySchema.index({ date: 1, meal: 1 }, { unique: true });
+const MealSummary = mongoose.model('MealSummary', mealSummarySchema);
 
-module.exports = mongoose.model('MealSummary', mealSummarySchema);
+module.exports = MealSummary;

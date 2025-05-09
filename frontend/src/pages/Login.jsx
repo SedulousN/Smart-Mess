@@ -32,7 +32,7 @@ const Login = () => {
                 if (data.role === 'admin') {
                     window.location.href = 'http://localhost:5175';
                 } else if (data.role === 'user') {
-                    navigate('/');
+                    navigate('/dashboard');
                 }
             } else {
                 setError(data.message);

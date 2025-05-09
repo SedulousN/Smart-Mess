@@ -5,10 +5,9 @@ const MessMenu = () => {
   const [fileType, setFileType] = useState(null);
 
   useEffect(() => {
-    const fileName = 'MessMenu'; // base name
+    const fileName = 'MessMenu';
     const possibleExtensions = ['pdf', 'jpg', 'jpeg', 'png'];
 
-    // Try loading one of the possible files
     const checkFile = async () => {
       for (let ext of possibleExtensions) {
         const url = `http://localhost:5500/uploads/${fileName}.${ext}`;
@@ -29,22 +28,34 @@ const MessMenu = () => {
   }, []);
 
   return (
-    <div className="max-w-4xl mx-auto p-6 bg-white shadow-lg rounded-lg">
-      <h1 className="text-3xl font-bold mb-4 mx-auto">Mess Menu</h1>
-      {menuUrl ? (
-        fileType === 'pdf' ? (
-          <embed src={`${menuUrl}?t=${Date.now()}`} width="100%" height="600px" type="application/pdf" />
-        ) : (
-          <img 
-            src={`${menuUrl}?t=${Date.now()}`} 
-            alt="Mess Menu" 
-            className="rounded-md shadow mx-auto d-block" 
-            style={{ width: '800px', height: '900px' }} 
-          />
-        )
-      ) : (
-        <p>No mess menu uploaded yet.</p>
-      )}
+    <div className="container my-4">
+      <div className="card shadow">
+        <div className="card-body text-center">
+          <h2 className="card-title mb-4">📋 Mess Menu</h2>
+
+          {menuUrl ? (
+            fileType === 'pdf' ? (
+              <div className="ratio ratio-4x3">
+                <embed
+                  src={`${menuUrl}?t=${Date.now()}`}
+                  type="application/pdf"
+                  width="100%"
+                  height="100%"
+                />
+              </div>
+            ) : (
+              <img
+                src={`${menuUrl}?t=${Date.now()}`}
+                alt="Mess Menu"
+                className="img-fluid rounded shadow-sm"
+                style={{ maxHeight: '900px' }}
+              />
+            )
+          ) : (
+            <p className="text-muted">No mess menu uploaded yet.</p>
+          )}
+        </div>
+      </div>
     </div>
   );
 };
