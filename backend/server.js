@@ -26,7 +26,7 @@ app.use('/qrcodes', express.static(path.join(__dirname, 'qrcodes')));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // MongoDB Connection
-mongoose.connect('mongodb://localhost:27017/messDB', {
+mongoose.connect('mongodb+srv://smartmess:omeKiHTjkww42WPP@mess.elupfnx.mongodb.net/', {
     useNewUrlParser: true,
     useUnifiedTopology: true,
 })
