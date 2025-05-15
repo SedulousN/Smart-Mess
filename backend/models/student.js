@@ -8,7 +8,8 @@ const studentSchema = new mongoose.Schema({
     role: { type: String, default: 'user' },
     qrCode: { type: String, required: true },
     hasEaten: { type: Boolean, default: false },
-    lastMeal: { type: String, default: '' }  // New field to track last meal time
+    lastMeal: { type: String, default: '' },
+    lastMealDate: { type: String, default: '' } // 🆕 Added
 });
 
 module.exports = mongoose.model('Student', studentSchema);

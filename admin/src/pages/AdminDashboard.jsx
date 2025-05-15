@@ -8,7 +8,7 @@ const AdminDashboard = () => {
         {/* Sidebar */}
         <div className="col-md-3 col-lg-2 bg-light p-4 min-vh-100">
           <h5 className="text-center mb-4">Admin Panel</h5>
-          <ul className="nav flex-column">
+          <ul className="nav">
             <li className="nav-item mb-3">
               <Link to="upload-menu" className="nav-link btn btn-outline-primary w-100">
                 📁 Upload Menu

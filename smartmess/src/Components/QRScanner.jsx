@@ -38,6 +38,7 @@ const QRScanner = () => {
 
     const validateQRCode = async (qrData) => {
         const studentID = qrData.split("-")[0];
+        console.log(studentID);
     
         try {
             const response = await fetch("http://localhost:5500/api/qr/validate", {

@@ -2,7 +2,6 @@ import { BrowserRouter as Router, Routes, Route, Navigate } from "react-router-d
 import AdminDashboard from "./pages/AdminDashboard";
 import UploadMenu from "./pages/UploadMenu";
 import AdminFeedback from "./pages/AdminFeedback";
-import MealData from "./pages/MealData";
 import AnnounceNotice from "./pages/AnnounceNotice";
 import MealSummary from "./pages/MealSummary";
 
@@ -22,7 +21,7 @@ function App() {
             </div>
           } />
           <Route path="upload-menu" element={<UploadMenu />} />
-          <Route path="/admin/announce-notice" element={<AnnounceNotice />} />
+          <Route path="announce-notice" element={<AnnounceNotice />} />
           <Route path="feedback" element={<AdminFeedback />} />
           <Route path="meal-summary" element={<MealSummary />} />
         </Route>

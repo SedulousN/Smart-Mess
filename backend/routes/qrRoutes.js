@@ -13,15 +13,16 @@ router.get('/history', qrController.getMealHistory);
 
 
 // Get all meal summaries for today
+// Get all meal summaries (past and present)
 router.get('/meal-summary', async (req, res) => {
-    try {
-      const date = new Date().toISOString().split('T')[0];
-      const summaries = await MealSummary.find({ date });
-      res.json(summaries);
-    } catch (err) {
-      res.status(500).json({ error: 'Failed to fetch meal summary' });
-    }
-  });
+  try {
+    const summaries = await MealSummary.find({}).sort({ date: -1 }); // No date filter, fetches all
+    res.json(summaries);
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to fetch meal summary' });
+  }
+});
+
 
 // Serve QR codes statically
 // router.use('/qrcodes', express.static('qrcodes'));

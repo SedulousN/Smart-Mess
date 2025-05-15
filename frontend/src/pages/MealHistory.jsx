@@ -67,10 +67,11 @@ const MealHistory = () => {
     }, [selectedMonth, selectedYear]);
 
     const getMealStatus = (date, meal) => {
-        const dateStr = date.toISOString().slice(0, 10);
+        const dateStr = `${date.getFullYear()}-${(date.getMonth() + 1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')}`;
         const entry = mealHistory.find(m => m.date === dateStr && m.meal === meal);
         return entry ? entry.status : "Missed";
     };
+
 
     const currentWeek = weeksInMonth[selectedWeekIndex] || [];
 
