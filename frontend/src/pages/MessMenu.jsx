@@ -10,7 +10,7 @@ const MessMenu = () => {
 
     const checkFile = async () => {
       for (let ext of possibleExtensions) {
-        const url = `http://localhost:5500/uploads/${fileName}.${ext}`;
+        const url = `https://smart-mess-bcdl.onrender.com/uploads/${fileName}.${ext}`;
         try {
           const res = await fetch(url, { method: 'HEAD' });
           if (res.ok) {

@@ -17,11 +17,11 @@ const Profile = () => {
                 return;
             }
 
-            axios.get(`http://localhost:5500/api/users/${userId}`)
+            axios.get(`https://smart-mess-bcdl.onrender.com/api/users/${userId}`)
                 .then(response => setUser(response.data))
                 .catch(error => console.error("Error fetching profile data:", error));
 
-            axios.get(`http://localhost:5500/api/users/${userId}/qrcode`)
+            axios.get(`https://smart-mess-bcdl.onrender.com/api/users/${userId}/qrcode`)
                 .then(response => setQrCode(response.data.qrCodePath))
                 .catch(error => console.error("Error fetching QR code:", error));
         }
@@ -47,7 +47,7 @@ const Profile = () => {
                         <div className="text-center mt-4">
                             <h5 className="mb-3">Your QR Code</h5>
                             <img 
-                                src={`http://localhost:5500${qrCode}`} 
+                                src={`https://smart-mess-bcdl.onrender.com${qrCode}`} 
                                 alt="QR Code" 
                                 className="img-thumbnail"
                                 style={{ width: "200px", height: "200px" }}

@@ -11,7 +11,7 @@ const UploadMenu = () => {
     formData.append("menu", menuFile);
 
     try {
-      await axios.post("http://localhost:5500/api/upload-mess-menu", formData);
+      await axios.post("https://smart-mess-bcdl.onrender.com/api/upload-mess-menu", formData);
       alert("Menu uploaded successfully!");
       setMenuFile(null);
     } catch (err) {

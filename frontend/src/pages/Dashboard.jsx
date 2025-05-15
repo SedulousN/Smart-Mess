@@ -67,7 +67,7 @@ const Dashboard = () => {
         }
 
         const studentID = checkTokenValidity();
-        axios.post("http://localhost:5500/api/feedback", {
+        axios.post("https://smart-mess-bcdl.onrender.com/api/feedback", {
             studentID,
             rating,
             message: feedbackMessage,

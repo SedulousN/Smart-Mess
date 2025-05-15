@@ -12,7 +12,7 @@ const AnnounceNotice = () => {
     }
 
     try {
-      await axios.post("http://localhost:5500/api/notices", {
+      await axios.post("https://smart-mess-bcdl.onrender.com/api/notices", {
         title,
         message,
         timestamp: new Date().toISOString(),

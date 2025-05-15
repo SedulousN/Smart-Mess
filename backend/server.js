@@ -99,7 +99,7 @@ app.post('/api/upload-mess-menu', upload.single('menu'), (req, res) => {
     const filePath = `/uploads/${req.file.filename}`;
     res.status(200).json({
         message: 'File uploaded successfully',
-        fileUrl: `http://localhost:5500${filePath}`,
+        fileUrl: `https://smart-mess-bcdl.onrender.com${filePath}`,
     });
 });
 

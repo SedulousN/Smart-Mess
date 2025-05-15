@@ -18,7 +18,7 @@ const MealSummary = () => {
   });
 
   useEffect(() => {
-    axios.get("http://localhost:5500/api/admin/meal-summary")
+    axios.get("https://smart-mess-bcdl.onrender.com/api/admin/meal-summary")
       .then((res) => {
         const summaries = {};
 
