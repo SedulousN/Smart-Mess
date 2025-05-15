@@ -17,7 +17,7 @@ const axios = require('axios');
 
 const app = express();
 app.use(bodyParser.json());
-app.use(cors({ origin: ['https://curious-chaja-ca9ce2.netlify.app', 'https://heroic-panda-733867.netlify.app', 'https://monumental-capybara-b7c8fb.netlify.app/admin'] }));
+app.use(cors({ origin: ['https://curious-chaja-ca9ce2.netlify.app', 'https://heroic-panda-733867.netlify.app', 'https://monumental-capybara-b7c8fb.netlify.app'] }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
