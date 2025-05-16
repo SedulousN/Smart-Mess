@@ -82,6 +82,7 @@ const Login = () => {
                 </form>
                 <div className="text-center mt-3">
                     <p className="mb-0">Don't have an account? <Link to="/register" className="text-primary text-decoration-none">Register here</Link></p>
+                    <Link to="/guest" className="btn btn-outline-secondary">Continue as Guest</Link>
                 </div>
             </div>
         </div>

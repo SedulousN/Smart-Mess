@@ -11,6 +11,8 @@ import Notices from "../pages/Notices";
 import Header from "../components/Header";
 import Login from "../pages/Login";
 import Register from "../pages/Register";
+import GuestMealSelection from "../pages/GuestMealSelection";
+
 
 const AppRoutes = () => {
     return (
@@ -23,6 +25,8 @@ const AppRoutes = () => {
                 {/* Public Routes */}
                 <Route path="/login" element={<Login />} />
                 <Route path="/register" element={<Register />} />
+
+                <Route path="/guest" element={<GuestMealSelection />} />
 
                 {/* Dashboard with Nested Routes */}
                 <Route path="/dashboard" element={<DashboardLayout />}>

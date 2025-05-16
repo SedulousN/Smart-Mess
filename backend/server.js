@@ -13,6 +13,7 @@ const MealHistory = require("./models/mealHistory");
 const MealSummary = require("./models/MealSummary");
 const cron = require('node-cron');
 const axios = require('axios');
+const guestRoutes = require('./routes/guest');
 
 
 const app = express();
@@ -37,6 +38,7 @@ mongoose.connect('mongodb+srv://smartmess:omeKiHTjkww42WPP@mess.elupfnx.mongodb.
 app.use('/api/qr', qrRoutes);
 app.use("/api/auth", authRouter);
 app.use('/api/admin', qrRoutes);
+app.use('/api/guest', guestRoutes);
 
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
