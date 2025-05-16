@@ -30,7 +30,7 @@ const Login = () => {
                 setQRCodePath(data.qrCodePath); // Display QR code after login
 
                 if (data.role === 'admin') {
-                    window.location.href = 'https://monumental-capybara-b7c8fb.netlify.app/admin';
+                    window.location.href = 'https://smart-mess-admin.vercel.app';
                 } else if (data.role === 'user') {
                     navigate('/dashboard');
                 }
