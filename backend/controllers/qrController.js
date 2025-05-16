@@ -5,6 +5,15 @@ const Student = require('../models/student');
 const MealHistory = require('../models/mealHistory');
 const MealSummary = require('../models/MealSummary');
 
+// Helper to get IST date and hour
+function getISTDateTime() {
+    const istNow = new Date().toLocaleString("en-US", { timeZone: "Asia/Kolkata" });
+    const dateInIST = new Date(istNow);
+    const mealDate = dateInIST.toISOString().split("T")[0]; // 'YYYY-MM-DD'
+    const currentHour = dateInIST.getHours();
+    return { mealDate, currentHour };
+}
+
 // Multer Storage Configuration
 const storage = multer.diskStorage({
     destination: (req, file, cb) => {
@@ -23,20 +32,15 @@ exports.generateQRCode = async (req, res) => {
     try {
         const { studentID, name } = req.body;
 
-        // Check if student already exists
         let student = await Student.findOne({ studentID });
         if (student) {
             return res.status(400).json({ success: false, message: "Student already exists!" });
         }
 
-        // Generate QR Code data
         const qrData = `${studentID}-${name}`;
         const qrCodeFilePath = path.resolve(__dirname, '../../qrcodes', `${studentID}.png`);
-
-        // Generate and save QR Code image
         await QRCode.toFile(qrCodeFilePath, qrData);
 
-        // Save student data with QR code path
         student = new Student({
             studentID,
             name,
@@ -59,40 +63,28 @@ exports.generateQRCode = async (req, res) => {
 };
 
 // Validate QR Code
-
 exports.validateQRCode = async (req, res) => {
     try {
         const { studentID } = req.body;
-
-        // Find student by ID
         const student = await Student.findOne({ studentID });
-        console.log(student);
-
         if (!student) {
             return res.status(404).json({ success: false, message: "Invalid QR Code!" });
         }
 
-        // Determine current meal based on time
-        const currentHour = new Date().getHours();
-        console.log(currentHour);
+        const { mealDate, currentHour } = getISTDateTime();
+
         let currentMeal = '';
-        if (currentHour >= 0 && currentHour < 12) {
+        if (currentHour >= 5 && currentHour < 12) {
             currentMeal = "Breakfast";
-        } else if (currentHour >= 12 && currentHour < 17) {
+        } else if (currentHour >= 12 && currentHour < 16) {
             currentMeal = "Lunch";
-        } else if (currentHour >= 17 && currentHour < 20) {
+        } else if (currentHour >= 16 && currentHour < 19) {
             currentMeal = "Snacks";
         } else {
             currentMeal = "Dinner";
         }
 
-        const mealDate = new Date().toLocaleDateString('en-CA'); // format: YYYY-MM-DD
-        console.log(mealDate);
-
-        // Check if the student already claimed the current meal today
         if (student.hasEaten && student.lastMeal === currentMeal && student.lastMealDate === mealDate) {
-            console.log(student.hasEaten);
-            console.log(student.lastMeal);
             return res.status(400).json({ success: false, message: `Meal already claimed for ${currentMeal}!` });
         }
 
@@ -100,13 +92,11 @@ exports.validateQRCode = async (req, res) => {
             student.hasEaten = false;
         }
 
-        // Update student meal status
         student.hasEaten = true;
         student.lastMeal = currentMeal;
         student.lastMealDate = mealDate;
         await student.save();
 
-        // Check MealHistory
         let mealHistory = await MealHistory.findOne({ studentID, date: mealDate, meal: currentMeal });
         if (!mealHistory) {
             mealHistory = new MealHistory({
@@ -120,21 +110,17 @@ exports.validateQRCode = async (req, res) => {
         }
         await mealHistory.save();
 
-        // ✅ Fixed: Only create MealSummary if it doesn't exist
         const existingSummary = await MealSummary.findOne({ date: mealDate, mealType: currentMeal });
-
         if (existingSummary) {
             existingSummary.count += 1;
             await existingSummary.save();
         } else {
-            // This will only run if no existing document is found
             const newSummary = new MealSummary({
                 date: mealDate,
                 mealType: currentMeal,
                 count: 1
             });
-
-            await newSummary.save(); // This avoids duplicate key error
+            await newSummary.save();
         }
 
         res.json({ success: true, message: `QR Code validated. Enjoy your ${currentMeal}!` });
@@ -145,28 +131,22 @@ exports.validateQRCode = async (req, res) => {
     }
 };
 
-
-
-
-
-// Job or task to automatically mark missed meals (can be scheduled to run every hour)
+// Mark missed meals job
 const markMissedMeals = async () => {
     try {
-        const currentHour = new Date().getHours();
-        const currentDate = new Date().toISOString().split('T')[0];
-        let currentMeal = '';
+        const { mealDate: currentDate, currentHour } = getISTDateTime();
 
-        if (currentHour >= 0 && currentHour < 12) {
+        let currentMeal = '';
+        if (currentHour >= 5 && currentHour < 12) {
             currentMeal = "Breakfast";
-        } else if (currentHour >= 12 && currentHour < 17) {
+        } else if (currentHour >= 12 && currentHour < 16) {
             currentMeal = "Lunch";
-        } else if (currentHour >= 17 && currentHour < 20) {
+        } else if (currentHour >= 16 && currentHour < 19) {
             currentMeal = "Snacks";
         } else {
             currentMeal = "Dinner";
         }
 
-        // Find students who haven't eaten yet for the current meal period
         const students = await Student.find({
             $or: [
                 { lastMealDate: { $ne: currentDate } },
@@ -174,14 +154,12 @@ const markMissedMeals = async () => {
             ]
         });
 
-        // Mark missed meal history for students who haven't eaten
         for (const student of students) {
-            const mealDate = new Date().toISOString().split('T')[0]; // Get current date
             await MealHistory.create({
                 studentID: student.studentID,
-                date: mealDate,
+                date: currentDate,
                 meal: currentMeal,
-                status: "Missed"  // Mark the meal as missed
+                status: "Missed"
             });
         }
     } catch (error) {
@@ -189,33 +167,23 @@ const markMissedMeals = async () => {
     }
 };
 
-// Example to schedule the missed meal marking (e.g., every hour)
-setInterval(markMissedMeals, 60 * 60 * 1000); // Every hour
-
+// Schedule it every hour
+setInterval(markMissedMeals, 60 * 60 * 1000);
 
 // Fetch Meal History for a student
 exports.getMealHistory = async (req, res) => {
     try {
-        const { userId } = req.query;  // Get the userId from query parameters (decoded from JWT)
-
-        // First, fetch the studentID based on userId
+        const { userId } = req.query;
         const student = await Student.findById(userId);
         if (!student) {
             return res.status(404).json({ success: false, message: "Student not found" });
         }
 
-        const studentID = student.studentID;  // Get the studentID from the Student model
-
-        // Fetch meal history based on the studentID
-        const meals = await MealHistory.find({ studentID }).sort({ date: -1 });  // Sort by date descending
-        console.log(meals);
-
-        res.json(meals);  // Return the meal history
+        const studentID = student.studentID;
+        const meals = await MealHistory.find({ studentID }).sort({ date: -1 });
+        res.json(meals);
     } catch (error) {
         console.error('Error fetching meal history:', error);
         res.status(500).json({ success: false, message: error.message });
     }
 };
-
-
-
