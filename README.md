@@ -131,7 +131,7 @@ _Screenshots of our dashboard, calendar and notices view here._
 ## 🙌 Contributors
 
 - Nitin Kumar Singh(https://github.com/SedulousN)
-- Shreyansh Goyal
+- Shreyansh Goyal(https://github.com/shreyansh-1911)
 
 ---
 
