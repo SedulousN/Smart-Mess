@@ -18,7 +18,7 @@ const AppRoutes = () => {
             <Header />
             <Routes>
                 {/* Redirect root path to /dashboard */}
-                <Route path="/dashboard" element={<Navigate to="/dashboard" replace />} />
+                <Route path="/" element={<Navigate to="/dashboard" replace />} />
 
                 {/* Public Routes */}
                 <Route path="/login" element={<Login />} />
