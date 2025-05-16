@@ -6,7 +6,7 @@ const AdminFeedback = () => {
     const [feedbacks, setFeedbacks] = useState([]);
 
     useEffect(() => {
-        axios.get("http://localhost:5500/api/feedback")
+        axios.get("https://smart-mess-bcdl.onrender.com/api/feedback")
             .then(res => setFeedbacks(res.data))
             .catch(err => {
                 console.error("Failed to fetch feedbacks:", err);

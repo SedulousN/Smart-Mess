@@ -44,7 +44,7 @@ const DashboardHome = () => {
 
   const fetchUserFeedback = (id) => {
     axios
-      .get(`http://localhost:5500/api/feedback/${id}`)
+      .get(`https://smart-mess-bcdl.onrender.com/api/feedback/${id}`)
       .then((res) => setFeedbacks(res.data.reverse())) // Assuming array is oldest-first
       .catch((err) => console.error("Failed to fetch feedback", err));
   };
@@ -55,7 +55,7 @@ const DashboardHome = () => {
     }
 
     axios
-      .post("http://localhost:5500/api/feedback", {
+      .post("https://smart-mess-bcdl.onrender.com/api/feedback", {
         studentID,
         rating,
         message,

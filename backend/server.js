@@ -17,7 +17,7 @@ const axios = require('axios');
 
 const app = express();
 app.use(bodyParser.json());
-app.use(cors({ origin: ['http://localhost:5173', 'http://localhost:5174', 'http://localhost:5175'] }));
+app.use(cors({ origin: ['https://curious-chaja-ca9ce2.netlify.app', 'https://heroic-panda-733867.netlify.app', 'https://monumental-capybara-b7c8fb.netlify.app'] }));
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
@@ -26,7 +26,7 @@ app.use('/qrcodes', express.static(path.join(__dirname, 'qrcodes')));
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
 // MongoDB Connection
-mongoose.connect('mongodb://localhost:27017/messDB', {
+mongoose.connect('mongodb+srv://smartmess:omeKiHTjkww42WPP@mess.elupfnx.mongodb.net/', {
     useNewUrlParser: true,
     useUnifiedTopology: true,
 })
@@ -99,7 +99,7 @@ app.post('/api/upload-mess-menu', upload.single('menu'), (req, res) => {
     const filePath = `/uploads/${req.file.filename}`;
     res.status(200).json({
         message: 'File uploaded successfully',
-        fileUrl: `http://localhost:5500${filePath}`,
+        fileUrl: `https://smart-mess-bcdl.onrender.com${filePath}`,
     });
 });
 

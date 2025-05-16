@@ -5,7 +5,7 @@ const Notices = () => {
   const [notices, setNotices] = useState([]);
 
   useEffect(() => {
-    axios.get("http://localhost:5500/api/notices")
+    axios.get("https://smart-mess-bcdl.onrender.com/api/notices")
       .then((res) => {
         setNotices(res.data);
       })

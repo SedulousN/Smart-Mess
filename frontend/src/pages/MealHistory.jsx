@@ -52,7 +52,7 @@ const MealHistory = () => {
             if (!userId) return;
 
             try {
-                const response = await axios.get("http://localhost:5500/api/qr/history", {
+                const response = await axios.get("https://smart-mess-bcdl.onrender.com/api/qr/history", {
                     params: { userId }
                 });
                 setMealHistory(response.data || []);

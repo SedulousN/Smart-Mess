@@ -13,7 +13,7 @@ const Login = () => {
         setError('');
 
         try {
-            const response = await fetch('http://localhost:5500/api/auth/login', {
+            const response = await fetch('https://smart-mess-bcdl.onrender.com/api/auth/login', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
@@ -30,7 +30,7 @@ const Login = () => {
                 setQRCodePath(data.qrCodePath); // Display QR code after login
 
                 if (data.role === 'admin') {
-                    window.location.href = 'http://localhost:5175';
+                    window.location.href = 'https://monumental-capybara-b7c8fb.netlify.app/admin';
                 } else if (data.role === 'user') {
                     navigate('/dashboard');
                 }
@@ -50,7 +50,7 @@ const Login = () => {
                 {error && <div className="alert alert-danger">{error}</div>}
                 {qrCodePath && (
                     <div className="text-center my-3">
-                        <img src={`http://localhost:5500${qrCodePath}`} alt="QR Code" width="150" />
+                        <img src={`https://smart-mess-bcdl.onrender.com${qrCodePath}`} alt="QR Code" width="150" />
                         <p>Scan this QR Code for identification</p>
                     </div>
                 )}
