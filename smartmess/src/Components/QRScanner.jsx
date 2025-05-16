@@ -41,7 +41,7 @@ const QRScanner = () => {
         console.log(studentID);
     
         try {
-            const response = await fetch("http://localhost:5500/api/qr/validate", {
+            const response = await fetch("https://smart-mess-bcdl.onrender.com/api/qr/validate", {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({ studentID }),
