@@ -127,18 +127,18 @@ _Screenshots of our dashboard, calendar and notices view here._
 
 
 ---
-## 🙌 Contributors
+## Links
 
-- Frontend(https://smart-mess-coral.vercel.app)
-- Scanner(https://smart-mess-scanner.vercel.app)
-- Admin(https://smart-mess-admin.vercel.app)
+- User (https://smart-mess-coral.vercel.app)
+- Scanner (https://smart-mess-scanner.vercel.app)
+- Admin (https://smart-mess-admin.vercel.app)
 
 ---
 
 ## 🙌 Contributors
 
-- Nitin Kumar Singh(https://github.com/SedulousN)
-- Shreyansh Goyal(https://github.com/shreyansh-1911)
+- Nitin Kumar Singh (https://github.com/SedulousN)
+- Shreyansh Goyal (https://github.com/shreyansh-1911)
 
 ---
 
